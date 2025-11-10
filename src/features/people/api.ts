@@ -1,4 +1,3 @@
-import { getJsonRetry } from "@api/http";
 import type { Person } from "@api/types";
 
 export type PeopleApiResponse = {
@@ -10,30 +9,49 @@ export type PeopleApiResponse = {
 
 function cloneParams(src: URLSearchParams): URLSearchParams {
 	const out = new URLSearchParams();
-	src.forEach((v, k) => {
+	for (const [k, v] of src.entries()) {
 		out.set(k, String(v).trim());
-	});
+	}
 	return out;
 }
 
+function resolveApiBase(): string {
+	const raw =
+		(import.meta.env.VITE_SW_API_BASE as string | undefined) ?? "/api";
+	const val = raw.trim();
+
+	if (/^https?:\/\//i.test(val)) {
+		return val.replace(/\/+$/, "");
+	}
+
+	if (/^\/?api(\/api)*\/?$/i.test(val)) {
+		return "/api";
+	}
+
+	return "/api";
+}
+
 function buildPeopleUrl(sp: URLSearchParams): string {
+	const base = resolveApiBase();
+
+	if (/^https?:\/\//i.test(base)) {
+		const u = new URL("/people/", base);
+		for (const [k, v] of sp.entries()) {
+			u.searchParams.set(k, v);
+		}
+		return u.toString();
+	}
+
 	const origin =
 		typeof window !== "undefined" && window.location?.origin
 			? window.location.origin
 			: "http://localhost";
 
-	const base = (
-		(import.meta.env.VITE_SW_API_BASE as string | undefined) ?? "/api"
-	).replace(/\/+$/, "");
-
-	// works for both absolute and relative base values
-	const url = new URL(`${base}/people/`, origin);
-
+	const u = new URL(`${base}/people/`, origin);
 	for (const [k, v] of sp.entries()) {
-		url.searchParams.set(k, v);
+		u.searchParams.set(k, v);
 	}
-
-	return url.toString();
+	return u.toString();
 }
 
 export async function fetchPeople(
@@ -51,5 +69,12 @@ export async function fetchPeople(
 	}
 
 	const url = buildPeopleUrl(sp);
-	return getJsonRetry<PeopleApiResponse>(url);
+	const res = await fetch(url, { method: "GET" });
+
+	if (!res.ok) {
+		throw new Error(`Failed to load people: ${res.status}`);
+	}
+
+	const data = (await res.json()) as PeopleApiResponse;
+	return data;
 }
