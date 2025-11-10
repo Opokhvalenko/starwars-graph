@@ -1,41 +1,86 @@
 name: CI
 
 on:
-  pull_request:
+  # Run on pushes to main and on every PR
   push:
-    branches: [ main ]
+    branches: [main]
+  pull_request:
+
+# Cancel previous in-progress runs of the same branch/PR
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Least privileges principle
+permissions:
+  contents: read
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
     steps:
+      # 1) Fetch repository
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 2) Setup Node.js with npm cache for faster installs
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 20                # Use Node 20
+          cache: npm                      # Enable npm cache
+          cache-dependency-path: package-lock.json
 
+      # 3) Clean, reproducible install (respects package-lock.json)
       - name: Install
         run: npm ci
 
+      # 4) Lint TS/JS with Biome (fails on errors)
       - name: Lint (Biome)
         run: npm run lint
 
+      # 5) Lint styles with Stylelint (fails on errors)
+      - name: Lint CSS
+        run: npm run lint:css
+
+      # 6) Type-check TypeScript (no emit)
       - name: Typecheck
         run: npm run typecheck
 
+      # 7) Run unit tests with coverage (Vitest + v8)
       - name: Unit tests (Vitest + coverage)
         run: npm run test:run -- --coverage
 
+      # 8) Upload lcov report as CI artifact (always, even on failure)
+      - name: Upload coverage (lcov)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: coverage/lcov.info
+          if-no-files-found: ignore
+
+      # 9) Build production bundle (Vite)
       - name: Build
         run: npm run build
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+      # 10) Install Playwright browsers + system deps (with caching)
+      #     This action also reuses cached browsers to speed up jobs.
+      - name: Install Playwright browsers (cached)
+        uses: microsoft/playwright-github-action@v1
 
+      # 11) Run E2E smoke tests (Playwright)
+      #     If playwright.config has webServer, it will start the app automatically.
       - name: E2E Smoke (Playwright)
         run: npm run test:e2e
-    
+
+      # 12) If E2E failed — upload HTML report to inspect failures
+      - name: Upload Playwright report (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          if-no-files-found: ignore
+          

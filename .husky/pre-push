@@ -1,0 +1,1 @@
+npm run -s test:run && npm run -s typecheck

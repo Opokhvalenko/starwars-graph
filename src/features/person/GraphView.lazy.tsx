@@ -40,7 +40,6 @@ export default function GraphView({
 				position: { x: n.position.x, y: n.position.y },
 				data: { label: n.data.label, kind: n.data.kind },
 				type: "default",
-				// Add semantic class based on node kind; palette comes from CSS variables
 				className: `node node--${n.data.kind}`,
 				style: {
 					borderWidth: 1,
@@ -68,8 +67,9 @@ export default function GraphView({
 
 	return (
 		<section
-			className="p-2 w-full h-full rounded-2xl border graph-panel border-slate-200 dark:border-slate-700"
 			data-testid="graph-flow"
+			aria-label="Person graph"
+			className="p-2 w-full h-full rounded-2xl border graph-panel border-slate-200 dark:border-slate-700"
 		>
 			<ReactFlow
 				nodes={n}

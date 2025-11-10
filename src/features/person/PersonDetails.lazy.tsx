@@ -15,6 +15,7 @@ async function loadByUrl<T>(url: string): Promise<T> {
 type BackFrom = { pathname: string; search?: string };
 type BackState = { from?: BackFrom };
 
+/** Person details page. Loads person → films → starships and renders the graph. */
 export default function PersonDetails() {
 	const { id } = useParams<{ id: string }>();
 	const location = useLocation();
@@ -33,8 +34,8 @@ export default function PersonDetails() {
 				setErrorMsg(null);
 
 				const base =
-					(import.meta.env.VITE_SW_API_BASE as string | undefined) ??
-					"/* /api by default */ /api";
+					(import.meta.env.VITE_SW_API_BASE as string | undefined) ?? "/api";
+
 				const personURL = `${base.replace(/\/+$/, "")}/people/${id}/`;
 				const p = await loadByUrl<Person>(personURL);
 
@@ -78,7 +79,7 @@ export default function PersonDetails() {
 		return <ErrorMessage message="Person not found." />;
 	}
 
-	// Fallback if there is no state.from (opened directly)
+	// Fallback if opened directly
 	const st = (location.state as BackState | null) ?? null;
 	const backTo = st?.from ?? { pathname: "/", search: location.search || "" };
 
@@ -109,11 +110,8 @@ export default function PersonDetails() {
 				</Link>
 			</div>
 
-			<div
-				data-testid="graph-flow"
-				className="overflow-hidden p-0 card graph-panel"
-				style={{ height: 560 }}
-			>
+			{/* wrapper without test id */}
+			<div className="overflow-hidden p-0 card" style={{ height: 560 }}>
 				<Suspense fallback={<Loader />}>
 					<GraphView person={person} films={films} starships={starships} />
 				</Suspense>
