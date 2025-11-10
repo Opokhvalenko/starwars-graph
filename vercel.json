@@ -1,5 +1,8 @@
 {
+	"buildCommand": "npm run build",
+	"outputDirectory": "dist",
 	"rewrites": [
-		{ "source": "/api/(.*)", "destination": "https://sw-api.starnavi.io/$1" }
+		{ "source": "/api/(.*)", "destination": "https://sw-api.starnavi.io/$1" },
+		{ "source": "/(.*)", "destination": "/index.html" }
 	]
 }
