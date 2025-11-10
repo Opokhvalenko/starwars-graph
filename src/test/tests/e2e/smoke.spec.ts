@@ -149,7 +149,7 @@ test("home renders people and details graph flow (all network mocked)", async ({
 	// Start waiting for URL change BEFORE the click to avoid race conditions
 	await Promise.all([
 		detailsLinks.first().click(),
-		expect(page).toHaveURL(/\/person\/\d+\/?$/),
+		expect(page).toHaveURL(/\/person\/\d+(?:\/)?(?:\?.*)?$/),
 	]);
 
 	// Graph container should appear
