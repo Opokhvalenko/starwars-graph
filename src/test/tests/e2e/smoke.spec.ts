@@ -139,21 +139,23 @@ test("home renders people and details graph flow (all network mocked)", async ({
 		await route.fulfill({ status: 404, body: "Not Found" });
 	});
 
-	// Open the app
-	await page.goto("/");
+	// Open the app (SPA-friendly)
+	await page.goto("/", { waitUntil: "domcontentloaded" });
 
 	// There are multiple "View details" links on the list, take the first
 	const detailsLinks = page.getByRole("link", { name: /View details/i });
 	await expect(detailsLinks.first()).toBeVisible();
-	await detailsLinks.first().click();
 
-	// Wait for SPA navigation to /person/:id
-	await page.waitForURL(/\/person\/\d+$/);
+	// Start waiting for URL change BEFORE the click to avoid race conditions
+	await Promise.all([
+		detailsLinks.first().click(),
+		expect(page).toHaveURL(/\/person\/\d+\/?$/),
+	]);
 
-	// ✅ Use the unique test id instead of a generic 'svg' selector
+	// Graph container should appear
 	await expect(page.getByTestId("graph-flow")).toBeVisible();
 
-	// React Flow should render actual graph nodes (not just controls/background)
+	// React Flow should render at least one node
 	await expect(
 		page.locator('[data-testid="graph-flow"] .react-flow__node').first(),
 	).toBeVisible();
