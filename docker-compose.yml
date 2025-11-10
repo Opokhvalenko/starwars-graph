@@ -1,0 +1,10 @@
+services:
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.proxy
+    environment:
+      - PORT=8787
+      - SW_API_BASE=https://sw-api.starnavi.io
+    ports:
+      - "8787:8787"

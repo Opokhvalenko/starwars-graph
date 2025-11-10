@@ -1,0 +1,30 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.3.4/schema.json",
+	"formatter": { "enabled": true },
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"a11y": {
+				"useButtonType": "error",
+				"useSemanticElements": "error",
+				"noRedundantRoles": "error"
+			},
+			"style": { "useBlockStatements": "error" }
+		}
+	},
+	"files": {
+		"includes": [
+			"src/**",
+			"server.ts",
+			"vite.config.ts",
+			"playwright.config.ts"
+		],
+		"ignoreUnknown": false
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	}
+}

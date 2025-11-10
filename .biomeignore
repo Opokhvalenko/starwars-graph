@@ -1,0 +1,46 @@
+# build / output
+dist/
+build/
+.out/
+.next/
+.vercel/
+storybook-static/
+.storybook-out/
+
+# tests & playwright
+playwright-report/
+test-results/
+.playwright/
+*.snap
+*.spec.*.png
+*.spec.*.jpg
+*.spec.*.jpeg
+
+# coverage
+coverage/
+
+# bundler caches
+.vite/
+.vitest/
+.rollup.cache/
+.turbo/
+.cache/
+
+# package managers
+pnpm-store/
+.pnpm-debug.log
+
+# misc
+*.log
+*.lockb
+.DS_Store
+
+# dependencies
+node_modules/
+
+# large public assets (optional — щоб Biome не сканив бінарники)
+public/**/*.png
+public/**/*.jpg
+public/**/*.jpeg
+public/**/*.gif
+public/**/*.webp

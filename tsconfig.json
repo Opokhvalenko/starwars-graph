@@ -1,0 +1,35 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"useDefineForClassFields": true,
+		"lib": ["ES2023", "DOM", "DOM.Iterable"],
+		"module": "ESNext",
+		"skipLibCheck": true,
+		"moduleResolution": "Bundler",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"noEmit": true,
+		"jsx": "react-jsx",
+		"strict": true,
+		"noImplicitOverride": true,
+		"noUncheckedIndexedAccess": true,
+		"forceConsistentCasingInFileNames": true,
+		"types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"],
+		"baseUrl": ".",
+		"paths": {
+			"@app/*": ["src/app/*"],
+			"@api/*": ["src/api/*"],
+			"@lib/*": ["src/lib/*"],
+			"@components/*": ["src/components/*"],
+			"@features/*": ["src/features/*"],
+			"@test/*": ["src/test/*"]
+		}
+	},
+	"include": [
+		"src",
+		"api",
+		"server.ts",
+		"vite.config.ts",
+		"playwright.config.ts"
+	]
+}

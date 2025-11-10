@@ -1,0 +1,235 @@
+@import "tailwindcss";
+
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+
+/* Dark mode driven by the `dark` class on <html> */
+@custom-variant dark (&:where(html.dark &));
+
+/* ── Design tokens ─────────────────────────────────────────── */
+@theme {
+	--brand: oklch(62% 0.2 255deg);
+	--brand-600: oklch(58% 0.2 255deg);
+	--brand-700: oklch(54% 0.2 255deg);
+	--shadow-card: 0 1px 2px 0 rgb(0 0 0 / 6%), 0 1px 3px 0 rgb(0 0 0 / 10%);
+	--radius-card: 0.75rem;
+	--app-bg: #f6f8fb;
+	--app-bg-dark: #0b1221;
+}
+
+/* ── Base ──────────────────────────────────────────────────── */
+@layer base {
+	html {
+		color-scheme: light dark;
+	}
+
+	body {
+		@apply min-h-screen antialiased;
+
+		color: rgb(15 23 42);
+		background: var(--app-bg);
+	}
+
+	.dark body {
+		color: rgb(241 245 249);
+		background: var(--app-bg-dark);
+	}
+
+	a {
+		@apply underline underline-offset-2 decoration-slate-300 hover:decoration-slate-400 text-blue-600 hover:text-blue-700 dark:text-sky-400 dark:hover:text-sky-300;
+	}
+
+	::selection {
+		color: #0b1221;
+		background: oklch(90% 0.06 255deg);
+	}
+}
+
+/* ── Utilities ─────────────────────────────────────────────── */
+@utility container-app {
+	@apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+@utility shadow-card {
+	box-shadow: var(--shadow-card);
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+
+/* No backdrop-blur to keep text crisp while scrolling */
+.header {
+	@apply sticky top-0 z-30 border-b border-slate-200 dark:border-slate-800;
+	@apply bg-white/90 dark:bg-slate-900/80;
+}
+
+.header__inner {
+	@apply container-app flex items-center justify-between py-4;
+}
+
+/* Brand link: crisp, no underline */
+.header-title {
+	@apply no-underline decoration-transparent text-blue-600 dark:text-sky-400 font-semibold text-2xl sm:text-3xl tracking-tight;
+}
+
+.header-title:hover {
+	@apply opacity-90;
+}
+
+.header-title:focus-visible {
+	@apply outline-none ring-2 ring-blue-500 dark:ring-sky-500 rounded-md;
+}
+
+/* ── Buttons / Inputs ─────────────────────────────────────── */
+.btn {
+	@apply inline-flex items-center justify-center gap-2 text-sm font-medium rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+	@apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700 active:bg-blue-800;
+}
+
+.btn-soft {
+	@apply bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700;
+}
+
+.btn-ghost {
+	@apply bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800;
+}
+
+.input {
+	@apply w-full h-11 rounded-xl border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100;
+}
+
+/* ── Cards ────────────────────────────────────────────────── */
+
+/* Subtle hover shadow without layout “jump” */
+.card {
+	@apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-3;
+
+	box-shadow: var(--shadow-card);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.card {
+		transition:
+			box-shadow 0.15s ease,
+			border-color 0.15s ease,
+			transform 0.15s ease;
+	}
+
+	.card:hover {
+		box-shadow: 0 6px 20px 0 rgb(2 6 23 / 10%);
+		border-color: rgb(148 163 184 / 60%);
+		transform: translateY(-1px);
+	}
+}
+
+/* Stable, visible focus ring applied to the whole card */
+.card:focus-within {
+	box-shadow: 0 6px 20px 0 rgb(2 6 23 / 10%);
+	outline: 2px solid rgb(59 130 246 / 55%);
+	outline-offset: 2px;
+}
+
+.dark .card:focus-within {
+	outline-color: rgb(56 189 248 / 55%);
+}
+
+.card a:focus,
+.card a:focus-visible {
+	outline: none;
+}
+
+/* Loading skeletons */
+.skeleton {
+	@apply animate-pulse rounded-xl bg-slate-200 dark:bg-slate-700;
+}
+
+/* Toolbar row above lists */
+.toolbar {
+	@apply flex items-center justify-between gap-3 mb-4;
+}
+
+/* ── React Flow / Graph ───────────────────────────────────── */
+
+/* Soft paper-like background for the canvas */
+.react-flow__background {
+	background-color: rgb(248 250 252 / 100%);
+}
+
+.dark .react-flow__background {
+	background-color: rgb(2 6 23 / 60%);
+}
+
+.react-flow__node-default {
+	@apply rounded-2xl border;
+}
+
+.react-flow__controls button {
+	@apply bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700;
+}
+
+.react-flow__edge-path {
+	stroke: rgb(100 116 139);
+	stroke-width: 2;
+}
+
+.dark .react-flow__edge-path {
+	stroke: rgb(148 163 184);
+}
+
+/* Subtle dotted grid behind React Flow canvas */
+.graph-panel {
+	background-image: radial-gradient(rgb(2 6 23 / 8%) 1px, transparent 1px);
+	background-position: -1px -1px;
+	background-size: 16px 16px;
+}
+
+.dark .graph-panel {
+	background-image: radial-gradient(
+		rgb(148 163 184 / 18%) 1px,
+		transparent 1px
+	);
+}
+
+/* Graph node palettes (no !important; classes applied from ReactFlow) */
+:root {
+	--node-text: rgb(15 23 42);
+	--node-person-bg: oklch(97% 0.02 250deg / 95%);
+	--node-person-border: rgb(203 213 225);
+	--node-film-bg: oklch(97% 0.03 180deg / 95%);
+	--node-film-border: rgb(203 213 225);
+	--node-starship-bg: oklch(98% 0.02 220deg / 95%);
+	--node-starship-border: rgb(203 213 225);
+}
+
+.dark :root,
+.dark {
+	--node-text: rgb(241 245 249);
+	--node-person-bg: oklch(32% 0.02 250deg / 55%);
+	--node-person-border: rgb(71 85 105);
+	--node-film-bg: oklch(34% 0.03 180deg / 55%);
+	--node-film-border: rgb(71 85 105);
+	--node-starship-bg: oklch(36% 0.02 220deg / 55%);
+	--node-starship-border: rgb(71 85 105);
+}
+
+/* Utility classes for node kinds */
+.node {
+	color: var(--node-text);
+}
+
+.node--person {
+	background: var(--node-person-bg);
+	border-color: var(--node-person-border);
+}
+
+.node--film {
+	background: var(--node-film-bg);
+	border-color: var(--node-film-border);
+}
+
+.node--starship {
+	background: var(--node-starship-bg);
+	border-color: var(--node-starship-border);
+}
