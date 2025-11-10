@@ -1,4 +1,11 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import {
+	useDeferredValue,
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useSearchParams } from "react-router-dom";
 
 const DEBOUNCE_MS = 400;
@@ -12,6 +19,7 @@ export default function SearchBar() {
 	const deferred = useDeferredValue(value);
 
 	const touchedRef = useRef(false);
+	const inputId = useId();
 
 	useEffect(() => {
 		// sync external url → input when user hasn't typed yet
@@ -63,7 +71,11 @@ export default function SearchBar() {
 
 	return (
 		<form className="search-form" aria-label="people search">
+			<label htmlFor={inputId} className="sr-only">
+				Search people
+			</label>
 			<input
+				id={inputId}
 				type="search"
 				aria-label="Search people"
 				autoComplete="off"

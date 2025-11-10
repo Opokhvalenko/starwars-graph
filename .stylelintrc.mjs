@@ -13,13 +13,11 @@ export default  {
       ],
     }],
 
-    // ⬇️ Дозволяємо kebab-case, BEM та react-flow__*
     "selector-class-pattern": [
       "^(?:react-flow__.*|[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*)?)?(?:--[a-z0-9-]+)?)$",
       { resolveNestedSelectors: true }
     ],
 
-    // (опційно) порядок властивостей
     "order/properties-order": [
       [
         { groupName: "position", properties: ["position","inset","top","right","bottom","left","z-index"] },

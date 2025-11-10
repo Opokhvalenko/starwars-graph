@@ -5,6 +5,8 @@ import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, vi } from "vitest";
 import { handlers } from "./handlers";
 
+vi.stubEnv("VITE_SW_API_BASE", "/api");
+
 // 2. create MSW server with base handlers
 const server = setupServer(...handlers);
 
