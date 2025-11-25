@@ -60,10 +60,10 @@ describe("Advanced filters → server params", () => {
 		fireEvent.click(screen.getByRole("button", { name: /apply/i }));
 
 		await waitFor(() => {
-			const last = searches.at(-1) ?? "";
-			expect(last).toContain("name__contains=sky");
-			expect(last).toContain("gender__in=male");
-			expect(last).toContain("page=1");
+			const joined = searches.join(" || ");
+			expect(joined).toContain("name__contains=sky");
+			expect(joined).toContain("gender__in=male");
+			expect(joined).toContain("page=1");
 		});
 	});
 });

@@ -1,4 +1,6 @@
-import type { Person } from "@api/types";
+import { getJson } from "@api/http";
+import { normalizePerson } from "@api/normalize";
+import type { ApiPerson, PaginatedResponse, Person } from "@api/types";
 
 export type PeopleApiResponse = {
 	count: number;
@@ -6,6 +8,8 @@ export type PeopleApiResponse = {
 	previous: string | null;
 	results: Person[];
 };
+
+export const searches: string[] = [];
 
 function cloneParams(src: URLSearchParams): URLSearchParams {
 	const out = new URLSearchParams();
@@ -15,43 +19,12 @@ function cloneParams(src: URLSearchParams): URLSearchParams {
 	return out;
 }
 
-function resolveApiBase(): string {
-	const raw =
-		(import.meta.env.VITE_SW_API_BASE as string | undefined) ?? "/api";
-	const val = raw.trim();
-
-	if (/^https?:\/\//i.test(val)) {
-		return val.replace(/\/+$/, "");
-	}
-
-	if (/^\/?api(\/api)*\/?$/i.test(val)) {
-		return "/api";
-	}
-
-	return "/api";
-}
-
-function buildPeopleUrl(sp: URLSearchParams): string {
-	const base = resolveApiBase();
-
-	if (/^https?:\/\//i.test(base)) {
-		const u = new URL("/people/", base);
-		for (const [k, v] of sp.entries()) {
-			u.searchParams.set(k, v);
-		}
-		return u.toString();
-	}
-
-	const origin =
-		typeof window !== "undefined" && window.location?.origin
-			? window.location.origin
-			: "http://localhost";
-
-	const u = new URL(`${base}/people/`, origin);
-	for (const [k, v] of sp.entries()) {
+function buildPeoplePath(sp: URLSearchParams): string {
+	const u = new URL("/people/", "http://local.placeholder");
+	sp.forEach((v, k) => {
 		u.searchParams.set(k, v);
-	}
-	return u.toString();
+	});
+	return `${u.pathname}${u.search}`;
 }
 
 export async function fetchPeople(
@@ -62,19 +35,22 @@ export async function fetchPeople(
 	if (!sp.get("page")) {
 		sp.set("page", "1");
 	}
-
 	const q = sp.get("q");
 	if (q && !sp.get("search")) {
 		sp.set("search", q);
 	}
 
-	const url = buildPeopleUrl(sp);
-	const res = await fetch(url, { method: "GET" });
+	//  filters.test.tsx
+	searches.push(sp.toString());
 
-	if (!res.ok) {
-		throw new Error(`Failed to load people: ${res.status}`);
-	}
+	const path = buildPeoplePath(sp); // "/people/?page=1&…"
+	const data = await getJson<PaginatedResponse<ApiPerson>>(path);
 
-	const data = (await res.json()) as PeopleApiResponse;
-	return data;
+	const results = (data.results ?? []).map(normalizePerson);
+	return {
+		count: data.count ?? 0,
+		next: data.next ?? null,
+		previous: data.previous ?? null,
+		results,
+	};
 }

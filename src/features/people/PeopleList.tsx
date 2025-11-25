@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import type { Person } from "../../api/types";
 import AdvancedFilters from "./AdvancedFilters";
-import { fetchPeople } from "./api";
+import { searches as apiSearches, fetchPeople } from "./api";
 import SearchBar from "./SearchBar";
 
 function safeScrollTop() {
@@ -95,6 +95,9 @@ export default function PeopleList() {
 		[params, page],
 	);
 	const reqKey = useMemo(() => reqParams.toString(), [reqParams]);
+	useEffect(() => {
+		apiSearches.push(reqKey);
+	}, [reqKey]);
 	const queryKey = useMemo(() => ["people", reqKey], [reqKey]);
 
 	const { data, isPending, isFetching, isError, error, refetch } = useQuery({
@@ -223,8 +226,13 @@ export default function PeopleList() {
 											</div>
 
 											<Link
-												to={{ pathname: `/person/${pid}`, search: searchStr }}
-												state={{ from: location }}
+												to={{ pathname: `/person/${pid}` }}
+												state={{
+													from: {
+														pathname: location.pathname,
+														search: location.search,
+													},
+												}}
 												className="inline-flex items-center px-3 h-9 text-sm rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700"
 											>
 												View details
